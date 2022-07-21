@@ -7,7 +7,7 @@ Server-side validation indicates that any input sent by the user (or client) can
 In Asp.Net Core, the server-side validation also known as **Model Validation**. Asp.Net Core validates the model with the constraints applied by validation attributes annotated on the top of each property of our model. These **validation attributes are known as Data Annotation**. The **ModelState** property checks whether the data is valid with respect to the annotation applied or not and ModelState.IsValid returns true if it's valid, false otherwise. 
 We will see the implementation in this lab
 
-**ModelState** is a property of a Controller instance, and can be accessed from any class that inherits from Controller Class. The ModelState has two purposes: to store and submit POSTed name-value pairs, and to store the validation errors associated with each value
+**ModelState** is a property of a Controller instance, and can be accessed from any class that inherits from Controller Class. The ModelState has two purposes: to store and submit posted name-value pairs, and to store the validation errors associated with each value
 
 The **Data Annotations** is a namespace that provides attribute classes, and these classes define metadata for controls for validation. Following is the list of built-in attributes 
 
@@ -36,9 +36,9 @@ AutoMapper is a simple library that helps us to transform one object type to ano
 ## **Case Study**
 Consider a bank application where an admin has the access to open an account for a user. If we have only client-side validation applied in our form, the application can easily be breached with some simple tricks and tools and modify the sensitive information. Here the magic of server-side validation prevents us from such scenarios which validates the data first with the constraints set by the application. 
 
-**Note:** click HERE to visit our lab on client-side validation  
+**Note:** To check the client-side validation lab click [here](https://github.com/PatternsTechGit/PT_AngularForms)
 
-We will implement a server side validation using AutoMapper for the above case study    
+We will implement a server side validation using AutoMapper 
 
 ---------------
 
@@ -69,25 +69,39 @@ For more details about this base project See: https://github.com/PatternsTechGit
 -----------
 
 ## **Frontend Code Base**
- From the previous lab, we have a simple form to  open a new account  for a user but we don't have any front-end side for this lab,  we will only **use the Postman to make a  HTTP request** to open an account for the user.
+Previously we have angular application in which we have
 
-  Click [here](https://www.postman.com/downloads/) to install the Postman 
+* **FontAwesome** library for icons.
+* **Bootstrap** library for styling.
+* Created **client side models** to receive data.
+* Created **transaction service** to call the API.
+* **Fixed the CORS** error on the server side.
+* **Populated html table**, using data returned by API.
+* Create **template driven form**.
+* Perform **input fields validation**.
+* Create client side **models** to map data for API.
+* Create the **account service** to call the API.
+   
+ We don't have any further implementations for front-end side for this lab,  we will only **use the Postman to make a HTTP request** to open an account for the user.
+
+To install the Postman click [here](https://www.postman.com/downloads/) 
 
 _____________
 
 ## **In this exercise**
 
 **Backend Code**
-* Create `AccountRequestDTO.cs` and **add data annotations** on the properties  
-* Add [ValidateNever] annotation **on the Id Property** of `BaseEntity.cs` file 
-* Change the **connectionString**  
+* Create a **DTO for account request** 
+* Add **data annotations** on the properties  
+* Add [ValidateNever] annotation **on the Id Property of BaseEntity class** 
+* Change the **connection string**  
 * Run **migration commands** to create a new database  
 * Install **AutoMapper** from nuget package manager console
 * Create a **mapping profile** 
 * Add **mapper configuration** in the `Program.cs` file 
-* Update the `AccountService.cs` file  and its contract 
-* Update the `AccountsController.cs` file 
-* **HTTP Calling for the OpenAccount**
+* Change the **account service and its contract w.r.t the DTO and AutoMapper**
+* Change the **accounts controller w.r.t the DTO and Model Validation**
+* **HTTP request to open an account** for a user
 
 ## **Backend Implementation**
 Follow the below steps to implement backend code for Server Side validation with AutoMapper
@@ -128,7 +142,7 @@ A DTO (Data Transfer Object) **defines part or all of data defined by the underl
  ```
 we have multiple annotations defined  for the properties  in which the validations are required. 
 
-## Step 2: **Add [ValidateNever] annotation in the `BaseEntity.cs` file** 
+## Step 2: **Add [ValidateNever] annotation in the BaseEntity Class** 
 Add a [ValidateNever] annotation **on the Id Property** of `BaseEntity.cs` file so that the Id property must should not be included in the migration process dor the database. 
 The updated `BaseEntity.cs` file looks like this 
 ```cs
@@ -319,6 +333,7 @@ Use the following
     "User": { "id": "test", "email": "abcd@xyz.com" }
   }
 ```
+## **Final Output**
 If the values passed are correct and the validations are passed the following response would be
 
 ![migration](readme-images/success.png)
