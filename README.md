@@ -254,7 +254,7 @@ public class AccountService : IAccountsService
 }
 ```
 
-## Step 7: **Implement the Accounts Controller**
+## Step 5: **Implement the Accounts Controller**
 Now we would create the `AccountsController.cs` file and create method **openAccount** where we would use the **ModelState.IsValid** property to check the server side validation as we applied data annotation on the DTO, The account service would be called if the validation get passed otherwise it will give us the bad request as a response 
 The code is given below
 ```cs
@@ -280,7 +280,7 @@ public async Task<ActionResult> OpenAccount(AccountRequestDTO accountRequest)
     }
 }
 ``` 
-## Step 7: **HTTP Calling for the OpenAccount**
+## Step 6: **HTTP Calling for the OpenAccount**
 We will use the Postman to make a HTTP hit on the OpenAccount as a endpoint in our controller
 Use the following 
 * **URL:** http://localhost:5070/api/accounts/OpenAccount
