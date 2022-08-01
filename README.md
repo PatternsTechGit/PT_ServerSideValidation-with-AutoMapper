@@ -43,14 +43,13 @@ We will implement a server side validation using AutoMapper
 ---------------
 
 ## About this exercise
-In this lab we will be working on two code Bases, **Backend Code base** and **Frontend Code Base**. We will use our **AngularForms lab as a starting point** for this lab
+In this lab we will be working on **Backend Codebase**. We will use **SOA lab** as a starting point for this lab.
 
-## **Backend Code Base**
+## **Backend Codebase**
 ### Previously 
-We developed a base structure of an API solution in Asp.net core that have just two controllers which are `TransactionController` and `AccountController`.
+We developed a base structure of an API solution in asp.net core that have one controller which is `TransactionController`
 
 * `TransactionController` have api functions `GetLast12MonthBalances` and `GetLast12MonthBalances/{userId}` which returns data for the last 12 months total balances.
-* `AccountController` have api function `OpenAccount(Account account)` which is used to create an account for the user
 
 There are 4 Projects in the solution. 
 
@@ -64,38 +63,21 @@ There are 4 Projects in the solution.
 
 ![](readme-images/4.png)
 
-For more details about this base project See: https://github.com/PatternsTechGit/PT_AngularForms
+For more details about this base project See: https://github.com/PatternsTechGit/PT_ServiceOrientedArchitecture
 
 -----------
 
-## **Frontend Code Base**
-Previously we have angular application in which we have
+We don't have implementations for frontend side for this lab,  we will only **use the Postman to make a HTTP request** to mock the open account request for the user and would see if model is validating the request or not .
 
-* **FontAwesome** library for icons.
-* **Bootstrap** library for styling.
-* Created **client side models** to receive data.
-* Created **transaction service** to call the API.
-* **Fixed the CORS** error on the server side.
-* **Populated html table**, using data returned by API.
-* Create **template driven form**.
-* Perform **input fields validation**.
-* Create client side **models** to map data for API.
-* Create the **account service** to call the API.
-   
- We don't have any further implementations for front-end side for this lab,  we will only **use the Postman to make a HTTP request** to open an account for the user.
-
-To install the Postman click [here](https://www.postman.com/downloads/) 
+To install the **postman** click [here](https://www.postman.com/downloads/) 
 
 _____________
 
 ## **In this exercise**
-
-**Backend Code**
+In this lab we would perform following for **backend codebase**
 * Create a **DTO for account request** 
 * Add **data annotations** on the properties  
 * Add [ValidateNever] annotation **on the Id Property of BaseEntity class** 
-* Change the **connection string**  
-* Run **migration commands** to create a new database  
 * Install **AutoMapper** from nuget package manager console
 * Create a **mapping profile** 
 * Add **mapper configuration** in the `Program.cs` file 
@@ -106,12 +88,12 @@ _____________
 ## **Backend Implementation**
 Follow the below steps to implement backend code for Server Side validation with AutoMapper
 
-### **Step 1: Create an Account Request DTO with Validations on the Properties**
+## Step 1: **Create an Account Request DTO with Validations on the Properties**
 
- **Create a new folder RequestDTO** in the Entities project of the solution project. **Create a new file** `AccountRequestDTO.cs` inside this folder  which will acts as a DTO to open the account for a user. 
+ Create a new folder **RequestDTO** in the Entities project of the solution project. **Create a new file** `AccountRequestDTO.cs` inside this folder  which will acts as a DTO to open the account for a user. 
  
  ### **What is a DTO?**
-A DTO (Data Transfer Object) **defines part or all of data defined by the underlying Domain object**. Note that data from different domain objects can be represented in a single DTO, that's actually one of the major benefits for having DTO.
+A DTO (Data Transfer Object) **defines part or all of data defined by the underlying Domain object**. Note that data from different domain objects can be represented by using a single DTO, that's actually one of the major benefits for having DTO.
 
  The code for this DTO is given below.
  ```cs
@@ -143,7 +125,7 @@ A DTO (Data Transfer Object) **defines part or all of data defined by the underl
 we have multiple annotations defined  for the properties  in which the validations are required. 
 
 ## Step 2: **Add [ValidateNever] annotation in the BaseEntity Class** 
-Add a [ValidateNever] annotation **on the Id Property** of `BaseEntity.cs` file so that the Id property must should not be included in the migration process dor the database. 
+Add a `[ValidateNever]` annotation **on the Id Property** of `BaseEntity.cs` file so that the Id property would be ignored in the validation. 
 The updated `BaseEntity.cs` file looks like this 
 ```cs
     public class BaseEntity
@@ -154,58 +136,37 @@ The updated `BaseEntity.cs` file looks like this
     }
 ```
 
-## Step 3: **Change the Connection String**
-In the `appSettings.Json` file,  **replace the connection string** with a given line. Here, **the Dot represents the local machine** and the **BBBankDB is the database name**
+We would also add **[ValidateNever]** in **User** entity for **navigation property** defined as virtual. A navigation property is just used to fetch related data to an entity.Also we need to set `ProfilePicURL` as nullable(using **?**) so that if value is not provided for it then validation error thrown would not be thrown for this entity proprety i.e. `ProfilePicURL`. Now the updated **User.cs** file looks like this
+
 ```cs
-"BBBankDBConnString": "Server=.;Initial Catalog=BBBankDB;Trusted_Connection=True"
-```
-The `appSettings.Json` file will looks like this 
-```cs
+public class User : BaseEntity // Inheriting from Base Entity class
 {
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*",
-  "ConnectionStrings": {
-    "BBBankDBConnString": "Server=.;Initial Catalog=BBBankDB;Trusted_Connection=True"
-  }
+    // First name
+    public string FirstName { get; set; }
+
+    // Last name
+    public string LastName { get; set; }
+
+    // Email of the user
+    public string Email { get; set; }
+
+    // Profile picture or avatar
+    public string? ProfilePicUrl { get; set; }
+
+    // Account attached to the user
+    // disbaling default asp.net validation since it is a navigation property 
+    [ValidateNever]
+    public virtual Account Account { get; set; }
 }
 ```
-## Step 4: **Run Migrations**
-Migration is a way to keep the database schema in sync with the EF Core model by preserving data. Run the migration commands to sync our entities with the database. 
-Follow the steps below to run the migration in Aso.Net Core
 
-### Step 1: **Create a Database**
-Create a new database **BBBankDB** in the SQL Server Management Studio by right clicking on the Databases folder.
-
-### Step 2: **Open the Package Manager Consol**
-Open the Package Manager Consol By clicking on the **Tools** in the menu bar, select **Nuget Package Manager** and than select **Package Manager Consol**. A console would appear like in the image shown below where you may run the migration commands. Select the **Infrastructure Project** as the default project in the NPM consol  
-
-![migration](readme-images/migration.png)
-
-### Step 3: **Add the Migration**
-Run the given migration command in the NPM console which will automatically add a new migration file in the **Migrations** folder inside the **Infrastructure Project** 
-```cs
-add-migration InitialMigration
-```
-### Step 4: **Update the Database**
-Run the given migration command in the NPM Console which will automatically update the database described in the connection string.
-```cs
-Update-Database
-```
-You may view your changing on the database side that you made on the entities. For more about the **entity framework migration on the ASP.Net Core 6** read the documentation by clicking the link below 
-[migration](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
-
-## Step 5: **AutoMapper**
+## Step 3: **AutoMapper**
 Follow the steps below to work with the **AutoMapper** 
 
-### Step 1: **Install the AutoMapper**
+### Step 3.1: **Install the AutoMapper**
 Install **AutoMapper** from nuget package manager console. First right click the **Service Project** and select  **Manage Nuget Packages**. Search **AutoMapper** and  click on the install button 
 
-### Step 2: **Create a Mapping Profile**
+### Step 3.2: **Create a Mapping Profile**
 Create a new file `MappingProfiles.cs` in the **BBBankAPI project** where we will describe the mapping profiles of our entities and DTOs.
 The code for this file is given below
 ```cs
@@ -225,7 +186,7 @@ namespace BBBankAPI
     }
 }
 ```
-### Step 3: **Add Mapping Configuration**
+### Step 3.3: **Add Mapping Configuration**
 Add **mapping configuration** in the `Program.cs` file, where we will set the `MappingProfiles.cs` file as a profile in the configuration and will add this configuration as a singleton service to be access in the pipeline 
 The code is given below  
  ```cs
@@ -238,85 +199,86 @@ The code is given below
     builder.Services.AddSingleton(mapper);
 ```
 
-## Step 6: **Account Service**
+## Step 4: **Account Service**
 Follow the steps below to update the account service
 
-### Step 1: **Update the Account Service Contract**
-First we need to update the account service contract `IAccountService.cs` openAccount method like given below
-```cs
-  public interface IAccountsService
-    {
-        Task OpenAccount(AccountRequestDTO account);
-    }
-```
-### Step 2: **Update the Account Service**
-Now, we need to update the account service `AccountService.cs` where we will first, inject the **IMapper** in the constructor as a **Dependency Injection** and also update the openAccount method 
-The `AccountService.cs` will looks like this
+### Step 4.1: **Create the Account Service Contract**
+In **Services** project create an interface (contract) in **Contracts** folder to implement the separation of concerns.
+It will make our code testable and injectable as a dependency.Create file `IAccountService.cs` and add **openAccount** method like given below
 
 ```cs
-    public class AccountService : IAccountsService
+public interface IAccountsService
+{
+    Task OpenAccount(AccountRequestDTO account);
+}
+```
+### Step 4.2: **Implement the Account Service**
+Now, we need to create the account service `AccountService.cs` where we will first, inject the **IMapper** in the constructor as a **Dependency Injection** and `AccountService.cs` **openAccount** method will be mapping DTO created in first step to **Account** entity. This line `_mapper.Map<Account>(accountRequest)` would be mapping the DTO to entity and after that would add **account** and **User** entity to **BBBankContext**
+
+```cs
+public class AccountService : IAccountsService
+{
+    private readonly BBBankContext _bbBankContext;
+    private readonly IMapper _mapper;
+
+    public AccountService(BBBankContext BBBankContext, IMapper mapper)
     {
-        private readonly BBBankContext _bbBankContext;
-        private readonly IMapper _mapper;
-
-        public AccountService(BBBankContext BBBankContext, IMapper mapper)
-        {
-            _mapper = mapper;
-            _bbBankContext = BBBankContext;
-        }
-
-        public async Task OpenAccount(AccountRequestDTO accountRequest)
-        {
-            // If the user with the same User ID is already in teh system we simply set the userId forign Key of Account with it else 
-            // first we create that user and then use it's ID.
-            var user = await _bbBankContext.Users.FirstOrDefaultAsync(x => x.Id == accountRequest.User.Id);
-            if (user == null)
-            {
-                //  await _bbBankContext.Users.AddAsync(accountRequest.User);
-                accountRequest.UserId = accountRequest.User.Id;
-            }
-            else
-            {
-                accountRequest.UserId = user.Id;
-            }
-
-            var account = _mapper.Map<Account>(accountRequest);
-
-            // Setting up ID of new incoming Account to be created.
-            account.Id = Guid.NewGuid().ToString();
-            // Once User ID forigen key and Account ID Primary Key is set we add the new accoun in Accounts.
-            await this._bbBankContext.Accounts.AddAsync(account);
-            // Once everything in place we make the Database call.
-            await this._bbBankContext.SaveChangesAsync();
-        }
+        _mapper = mapper;
+        _bbBankContext = BBBankContext;
     }
+
+    public async Task OpenAccount(AccountRequestDTO accountRequest)
+    {
+        // If the user with the same User ID is already in teh system we simply set the userId foreign Key of Account with it else 
+        // first we create that user and then use it's ID.
+        var user = await _bbBankContext.Users.FirstOrDefaultAsync(x => x.Id == accountRequest.User.Id);
+        if (user == null)
+        {
+            await _bbBankContext.Users.AddAsync(accountRequest.User);
+            accountRequest.UserId = accountRequest.User.Id;
+        }
+        else
+        {
+            accountRequest.UserId = user.Id;
+        }
+
+        var account = _mapper.Map<Account>(accountRequest);
+
+        // Setting up ID of new incoming Account to be created.
+        account.Id = Guid.NewGuid().ToString();
+        // Once User ID forigen key and Account ID Primary Key is set we add the new accoun in Accounts.
+        await this._bbBankContext.Accounts.AddAsync(account);
+        // Once everything in place we make the Database call.
+        await this._bbBankContext.SaveChangesAsync();
+    }
+}
 ```
 
-## Step 7: **Update the Accounts Controller**
-Update the `AccountsController.cs` file openAccount method where we have used the ModelState.IsValid property to check the server side validation as we applied data annotation on the DTO, The account will e created if the validation are passed otherwise it will give us the bad request as a response 
+## Step 7: **Implement the Accounts Controller**
+Now we would create the `AccountsController.cs` file and create method **openAccount** where we would use the **ModelState.IsValid** property to check the server side validation as we applied data annotation on the DTO, The account service would be called if the validation get passed otherwise it will give us the bad request as a response 
 The code is given below
 ```cs
 [HttpPost]
-        [Route("OpenAccount")]
-        public async Task<ActionResult> OpenAccount(AccountRequestDTO accountRequest)
+[Route("OpenAccount")]
+public async Task<ActionResult> OpenAccount(AccountRequestDTO accountRequest)
+{
+    try
+    {
+        if (ModelState.IsValid)
         {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    await _accountsService.OpenAccount(accountRequest);
-                    return new OkObjectResult("New Account Created.");
-                }
-                else
-                {
-                    return new BadRequestObjectResult(ModelState.Values);
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BadRequestObjectResult(ex);
-            }
+            await _accountsService.OpenAccount(accountRequest);
+            return new OkObjectResult("New Account Created.");
         }
+        else
+        {
+            return new BadRequestObjectResult(ModelState.Values);
+        }
+    }
+    catch (Exception ex)
+    {
+        return new BadRequestObjectResult(ex);
+    }
+}
 ``` 
 ## Step 7: **HTTP Calling for the OpenAccount**
 We will use the Postman to make a HTTP hit on the OpenAccount as a endpoint in our controller
@@ -330,7 +292,7 @@ Use the following
     "CurrentBalance": 147.12,
     "AccountStatus": 1,
     "UserId": "aa45e3c9-261d-41fe-a1b0-5b4dcf79cfd3",
-    "User": { "id": "test", "email": "abcd@xyz.com" }
+    "User": { "id": "aa45e3c9-261d-41fe-a1b0-5b4dcf79cfd3", "FirstName":"Ahmed","LastName":"Ali", "Email": "ali@gmail.com" }
   }
 ```
 ## **Final Output**
