@@ -136,7 +136,7 @@ The updated `BaseEntity.cs` file looks like this
     }
 ```
 
-We would also add **[ValidateNever]** in **User** entity for **navigation property** defined as virtual. A navigation property is just used to fetch related data to an entity.Also we need to set `ProfilePicURL` as nullable(using **?**) so that if value is not provided for it then validation error thrown would not be thrown for this entity proprety i.e. `ProfilePicURL`. Now the updated **User.cs** file looks like this
+We would also add **[ValidateNever]** in **User** entity for **navigation property** defined as virtual. A navigation property is just used to fetch related data to an entity.Also we need to set `ProfilePicURL` as nullable(using **?**) so that if value is not provided for it then validation error thrown would not be thrown for this entity property i.e. `ProfilePicURL`. Now the updated **User.cs** file looks like this
 
 ```cs
 public class User : BaseEntity // Inheriting from Base Entity class
@@ -164,7 +164,7 @@ public class User : BaseEntity // Inheriting from Base Entity class
 Follow the steps below to work with the **AutoMapper** 
 
 ### Step 3.1: **Install the AutoMapper**
-Install **AutoMapper** from nuget package manager console. First right click the **Service Project** and select  **Manage Nuget Packages**. Search **AutoMapper** and  click on the install button 
+Install **AutoMapper** from nuget package manager console. First right click the **Service Project** and select  **Manage Nuget Packages**. Search **AutoMapper** and  click on the install button. After the **AutoMapper** nuget installation, build solution so that when we use **AutoMapper** in below steps we does not get error to install AutoMapper again. 
 
 ### Step 3.2: **Create a Mapping Profile**
 Create a new file `MappingProfiles.cs` in the **BBBankAPI project** where we will describe the mapping profiles of our entities and DTOs.
@@ -229,12 +229,12 @@ public class AccountService : IAccountsService
 
     public async Task OpenAccount(AccountRequestDTO accountRequest)
     {
-        // If the user with the same User ID is already in teh system we simply set the userId foreign Key of Account with it else 
+        // If the user with the same User ID is already in teh system we simply set the userId forign Key of Account with it else 
         // first we create that user and then use it's ID.
-        var user = await _bbBankContext.Users.FirstOrDefaultAsync(x => x.Id == accountRequest.User.Id);
+        var user = _bbBankContext.Users.FirstOrDefault(x => x.Id == accountRequest.User.Id);
         if (user == null)
         {
-            await _bbBankContext.Users.AddAsync(accountRequest.User);
+            _bbBankContext.Users.Add(accountRequest.User);
             accountRequest.UserId = accountRequest.User.Id;
         }
         else
@@ -247,9 +247,8 @@ public class AccountService : IAccountsService
         // Setting up ID of new incoming Account to be created.
         account.Id = Guid.NewGuid().ToString();
         // Once User ID forigen key and Account ID Primary Key is set we add the new accoun in Accounts.
-        await this._bbBankContext.Accounts.AddAsync(account);
-        // Once everything in place we make the Database call.
-        await this._bbBankContext.SaveChangesAsync();
+        this._bbBankContext.Accounts.Add(account);
+
     }
 }
 ```
